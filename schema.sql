@@ -80,5 +80,10 @@ UPPER(TRIM(district)) AS district,
 county
 FROM raw_house_data.house_price_paid;
 
+DROP INDEX IF EXISTS district_index;
+DROP INDEX IF EXISTS date_index;
+CREATE INDEX IF NOT EXISTS district_index ON house_data.house_price_paid ("district");
+CREATE INDEX IF NOT EXISTS date_index ON house_data.house_price_paid ("date");
+
 DROP TABLE raw_house_data.house_price_paid;
 DROP TABLE raw_house_data.local_authority_districts_map;
