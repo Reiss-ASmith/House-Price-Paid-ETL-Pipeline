@@ -46,3 +46,9 @@ CREATE TABLE IF NOT EXISTS raw_house_data.house_price_paid (
 --imports files into tables above
 COPY raw_house_data.local_authority_districts_map FROM '/imports/local_authority_districts_map.csv' WITH DELIMITER ',' csv HEADER;
 COPY raw_house_data.house_price_paid FROM '/imports/pp-2025.csv' DELIMITER ',' csv HEADER;
+
+CREATE TABLE IF NOT EXISTS house_data.counties (
+    county_id SMALLSERIAL,
+    county TEXT NOT NULL,
+    PRIMARY KEY (county_id)
+);
