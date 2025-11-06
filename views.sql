@@ -16,14 +16,20 @@ SELECT EXTRACT('MONTH' FROM "date") AS "Month", ROUND(percentile_cont(0.5) WITHI
 FROM house_data.house_price_paid
 GROUP BY EXTRACT('MONTH' FROM "date");
 
-DROP VIEW IF EXISTS total_number_of_sales_per_district;
-CREATE VIEW total_number_of_sales_per_district AS
-SELECT district, COUNT(*)
+DROP VIEW IF EXISTS total_sales_per_district;
+CREATE VIEW total_sales_per_district AS
+SELECT district, COUNT(*) AS total_house_sales
 FROM house_data.house_price_paid
 GROUP BY district;
 
-DROP VIEW IF EXISTS total_number_of_sales_per_county;
-CREATE VIEW total_number_of_sales_per_county AS
-SELECT county, COUNT(*)
+DROP VIEW IF EXISTS total_sales_per_county;
+CREATE VIEW total_sales_per_county AS
+SELECT county, COUNT(*) AS total_house_sales
 FROM house_data.house_price_paid
 GROUP BY county;
+
+DROP VIEW IF EXISTS total_sales_per_month;
+CREATE VIEW total_sales_per_month AS
+SELECT EXTRACT('MONTH' FROM "date") AS "Month", COUNT(*) AS total_house_sales
+FROM house_data.house_price_paid
+GROUP BY EXTRACT('MONTH' FROM "date");
