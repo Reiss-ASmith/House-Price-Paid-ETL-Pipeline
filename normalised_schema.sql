@@ -94,16 +94,12 @@ INSERT INTO house_data.counties(county)
 SELECT DISTINCT county
 FROM raw_house_data.house_price_paid;
 
---inserts data into the districts table using a CTE
-WITH district_table_data AS(
-    SELECT DISTINCT r.district AS district, r.county, co.county_id, lad.LAD23CD
-    FROM raw_house_data.house_price_paid AS r
-    JOIN house_data.counties AS co ON co.county = r.county
-    JOIN raw_house_data.local_authority_districts_map AS lad ON UPPER(TRIM(lad.LAD23NM)) = r.district
-)
- INSERT INTO house_data.districts(lad23cd, district, county_id)
- SELECT LAD23CD, district, county_id
- FROM district_table_data;
+--inserts data into the districts table by joining three tables together for the required columns
+INSERT INTO house_data.districts(lad23cd, district, county_id)
+SELECT DISTINCT lad.LAD23CD, r.district, co.county_id
+FROM raw_house_data.house_price_paid AS r
+JOIN house_data.counties AS co ON co.county = r.county
+JOIN raw_house_data.local_authority_districts_map AS lad ON UPPER(TRIM(lad.LAD23NM)) = UPPER(TRIM(r.district));
 
 --inserts data into the property_types table
 INSERT INTO house_data.property_types(property_type, property_type_code)
@@ -119,6 +115,17 @@ INSERT INTO house_data.tenures(tenure_code, tenure_name)
 VALUES
 ('F', 'Freehold'),
 ('L', 'Leasehold');
+
+INSERT INTO house_data.house_price_paid(sale_id, price, "date", property_type_code, new_build, district_id, tenure_code)
+SELECT r.sale_id,
+r.price,
+CAST(r."datetime" AS DATE),
+r.property_type,
+(r.new_build = 'Y'),
+d.district_id,
+r.tenure
+FROM raw_house_data.house_price_paid AS r 
+JOIN house_data.districts as d ON UPPER(TRIM(d.district)) = UPPER(TRIM(r.district));
 
 --deletes the raw_house_data schema
 DROP SCHEMA IF EXISTS raw_house_data CASCADE;
