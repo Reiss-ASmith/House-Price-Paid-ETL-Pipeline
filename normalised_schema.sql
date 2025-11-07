@@ -6,6 +6,8 @@ DROP SCHEMA IF EXISTS raw_house_data CASCADE;
 CREATE SCHEMA IF NOT EXISTS house_data;
 CREATE SCHEMA IF NOT EXISTS raw_house_data;
 
+SET DateStyle TO 'European';
+
 -- raw_house_data schema creation
 --creates a temporary table used to store the raw data from the local_authority_district_map file later
 CREATE TABLE IF NOT EXISTS raw_house_data.local_authority_districts_map (
@@ -48,42 +50,35 @@ COPY raw_house_data.local_authority_districts_map FROM '/imports/local_authority
 COPY raw_house_data.house_price_paid FROM '/imports/pp-2025.csv' DELIMITER ',' csv HEADER;
 
 CREATE TABLE IF NOT EXISTS house_data.counties (
-    county_id SMALLSERIAL,
-    county TEXT NOT NULL,
-    PRIMARY KEY (county_id)
+    county_id SMALLSERIAL PRIMARY KEY,
+    county TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS house_data.property_types (
     property_type VARCHAR(32) NOT NULL,
-    property_type_code CHAR(1) NOT NULL,
-    PRIMARY KEY (property_type_code)
+    property_type_code CHAR(1) PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS house_data.tenures (
-    tenure_code CHAR(1) NOT NULL,
-    tenure_name VARCHAR(10) NOT NULL,
-    PRIMARY KEY (tenure_code)
-);
-
-SET DateStyle TO 'European';
-
-CREATE TABLE IF NOT EXISTS house_data.house_price_paid (
-    sale_id TEXT NOT NULL,
-    price INT NOT NULL,
-    "date" DATE NOT NULL,
-    property_type_code CHAR(1) NOT NULL,
-    new_build BOOLEAN NOT NULL,
-    district_id TEXT NOT NULL,
-    tenure_code CHAR(1) NOT NULL,
-    PRIMARY KEY (sale_id)
+    tenure_code CHAR(1) PRIMARY KEY,
+    tenure_name VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS house_data.districts (
-    district_id SMALLSERIAL,
+    district_id SMALLSERIAL PRIMARY KEY,
     lad23cd VARCHAR(9) UNIQUE NOT NULL,
     district TEXT NOT NULL,
-    county_id INT NOT NULL,
-    PRIMARY KEY (district_id)
+    county_id INT REFERENCES house_data.counties(county_id)
+);
+
+CREATE TABLE IF NOT EXISTS house_data.house_price_paid (
+    sale_id TEXT PRIMARY KEY,
+    price INT NOT NULL,
+    "date" DATE NOT NULL,
+    property_type_code CHAR(1) REFERENCES house_data.property_types(property_type_code),
+    new_build BOOLEAN NOT NULL,
+    district_id INT REFERENCES house_data.districts(district_id),
+    tenure_code CHAR(1) REFERENCES house_data.tenures(tenure_code)
 );
 
 INSERT INTO house_data.counties(county)
