@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS raw_house_data.local_authority_districts_map (
 CREATE TABLE IF NOT EXISTS raw_house_data.house_price_paid (
     sale_id TEXT NOT NULL UNIQUE,
     price INT NOT NULL,
-    "datetime" TEXT NOT NULL,
+    "datetime" TIMESTAMP NOT NULL,
     postcode VARCHAR(10),
     property_type CHAR(1) NOT NULL,
     new_build CHAR(1) NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS house_data.districts (
 
 --creates a table for the house price paid data that references other tables
 CREATE TABLE IF NOT EXISTS house_data.house_price_paid (
-    sale_id TEXT PRIMARY KEY,
+    sale_id TEXT,
     price INT NOT NULL,
     "date" DATE NOT NULL,
     property_type_code CHAR(1) REFERENCES house_data.property_types(property_type_code),
@@ -87,6 +87,24 @@ CREATE TABLE IF NOT EXISTS house_data.house_price_paid (
     district_id INT REFERENCES house_data.districts(district_id),
     tenure_code CHAR(1) REFERENCES house_data.tenures(tenure_code)
 ) PARTITION BY RANGE("date");
+
+CREATE TABLE house_data.house_price_paid_2025 PARTITION OF house_data.house_price_paid
+    FOR VALUES FROM ('01-01-2025') TO ('01-01-2026');
+
+CREATE TABLE house_data.house_price_paid_2024 PARTITION OF house_data.house_price_paid
+    FOR VALUES FROM ('01-01-2024') TO ('01-01-2025');
+
+CREATE TABLE house_data.house_price_paid_2023 PARTITION OF house_data.house_price_paid
+    FOR VALUES FROM ('01-01-2023') TO ('01-01-2024');
+
+CREATE TABLE house_data.house_price_paid_2022 PARTITION OF house_data.house_price_paid
+    FOR VALUES FROM ('01-01-2022') TO ('01-01-2023');
+
+CREATE TABLE house_data.house_price_paid_2021 PARTITION OF house_data.house_price_paid
+    FOR VALUES FROM ('01-01-2021') TO ('01-01-2022');
+
+CREATE TABLE house_data.house_price_paid_2020 PARTITION OF house_data.house_price_paid
+    FOR VALUES FROM ('01-01-2020') TO ('01-01-2021');
 
 -- INSERTING DATA INTO TABLES
 --inserts data into the county table
