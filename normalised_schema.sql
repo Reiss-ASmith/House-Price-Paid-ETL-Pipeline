@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS house_data.house_price_paid (
     new_build BOOLEAN NOT NULL,
     district_id TEXT NOT NULL,
     tenure_code CHAR(1) NOT NULL,
+    PRIMARY KEY (sale_id)
 );
 
 CREATE TABLE IF NOT EXISTS house_data.districts (
@@ -82,5 +83,20 @@ CREATE TABLE IF NOT EXISTS house_data.districts (
     lad23cd VARCHAR(9) UNIQUE NOT NULL,
     district TEXT NOT NULL,
     county_id INT NOT NULL,
+    PRIMARY KEY (district_id)
 );
 
+INSERT INTO house_data.counties(county)
+SELECT DISTINCT county
+FROM raw_house_data.house_price_paid;
+
+WITH district_table_data AS(
+    SELECT DISTINCT r.district AS district, r.county, co.county_id, lad.LAD23CD
+    FROM raw_house_data.house_price_paid AS r
+    JOIN house_data.counties AS co ON co.county = r.county
+    JOIN raw_house_data.local_authority_districts_map AS lad ON UPPER(TRIM(lad.LAD23NM)) = r.district
+)
+ INSERT INTO house_data.districts(lad23cd, district, county_id)
+ SELECT LAD23CD, district, county_id
+ FROM district_table_data;
+ 
