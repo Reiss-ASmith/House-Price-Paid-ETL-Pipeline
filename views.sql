@@ -45,3 +45,10 @@ CREATE VIEW median_price_per_year AS
 SELECT EXTRACT('YEAR' FROM "date") AS "Year", ROUND(percentile_cont(0.5) WITHIN GROUP(ORDER BY price)::numeric, 2) AS median_price
 FROM house_data.house_price_paid
 GROUP BY EXTRACT('YEAR' FROM "date");
+
+DROP VIEW IF EXISTS median_price_per_district_per_year;
+CREATE VIEW median_price_per_district_per_year AS
+SELECT d.lad23cd, d.district, EXTRACT(YEAR FROM p."date")::int AS year, percentile_cont(0.5) WITHIN GROUP (ORDER BY p.price)::numeric AS median_price
+FROM house_data.house_price_paid p
+JOIN house_data.districts d ON d.district_id = p.district_id
+GROUP BY d.lad23cd, d.district, EXTRACT(YEAR FROM p."date");
