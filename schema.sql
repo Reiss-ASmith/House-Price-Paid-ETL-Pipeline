@@ -144,7 +144,8 @@ r.property_type,
 d.district_id,
 r.tenure
 FROM raw_house_data.house_price_paid AS r 
-JOIN house_data.districts as d ON UPPER(TRIM(d.district)) = UPPER(TRIM(r.district));
+JOIN house_data.districts as d ON UPPER(TRIM(d.district)) = UPPER(TRIM(r.district))
+ON CONFLICT (r.sale_id) DO NOTHING;
 
 --creates index on the date column in the house_price_paid table
 CREATE INDEX IF NOT EXISTS date_index ON house_data.house_price_paid ("date");
