@@ -1,7 +1,3 @@
---clears the database
-DROP SCHEMA IF EXISTS house_data CASCADE;
-DROP SCHEMA IF EXISTS raw_house_data CASCADE;
-
 --creates schemas for data imports
 CREATE SCHEMA IF NOT EXISTS house_data;
 CREATE SCHEMA IF NOT EXISTS raw_house_data;
