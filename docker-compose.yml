@@ -1,19 +1,17 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:latest
-    container_name: house_price_paid_analysis
+    container_name: house_price_paid_elt_pipeline
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_DB: house_price_paid_analysis
+      POSTGRES_DB: house_price_paid_elt_pipeline
       POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
     volumes:
       - ./data:/imports
-      - pgdata:/var/lib/postgresql
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:
