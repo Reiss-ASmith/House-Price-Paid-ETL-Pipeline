@@ -58,3 +58,24 @@ EXTRACT(YEAR FROM p."date")::int AS year,
 ROUND(percentile_cont(0.5) WITHIN GROUP (ORDER BY p.price)::numeric, 2) AS median_price
 FROM house_data.house_price_paid p
 GROUP BY EXTRACT(YEAR FROM p."date");
+
+
+-- ranks the median house sale of each district per month
+
+CREATE OR REPLACE VIEW house_data.v_median_price_per_district_ranked AS
+with median_prices AS (
+    SELECT
+        DATE_TRUNC('month', p."date")::date AS month_start,
+        d.district as district_name,
+        ROUND(percentile_cont(0.5) WITHIN GROUP (ORDER BY p.price)::numeric, 2) AS median_price
+    FROM house_data.house_price_paid p
+    JOIN house_data.districts d ON d.district_id = p.district_id
+    GROUP BY DATE_TRUNC('month', p."date")::date, d.district
+    )
+SELECT
+    district_name,
+    median_price,
+    EXTRACT(YEAR FROM month_start)::int AS year,
+    EXTRACT(MONTH FROM month_start)::int AS month,
+    DENSE_RANK() OVER(PARTITION BY month_start ORDER BY median_price DESC) AS median_price_rank
+FROM median_prices;
