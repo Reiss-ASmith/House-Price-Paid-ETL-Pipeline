@@ -39,3 +39,9 @@ def copy_map_data():
                     """, local_map
                 )
         conn.commit()
+
+def load_from_raw():
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            run_sql_file(cur, "02_load.sql")
+        conn.commit()
