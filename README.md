@@ -130,7 +130,6 @@ These views are consumed directly by **Power BI**, which is used to create an in
 
 - Deploy the pipeline to a cloud-hosted PostgreSQL database (Azure)
 - Automate monthly updates using GitHub Actions
-- Add basic data quality checks such as row counts and null checks
 - Migrate analytics layer to Microsoft Fabric
 
 ---
