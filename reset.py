@@ -4,6 +4,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+#Resets the database
 def reset_database():
     log.info("Attempting to reset database")
     with get_connection() as conn:

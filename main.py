@@ -16,6 +16,7 @@ from log import setup_logging
 
 log = logging.getLogger(__name__)
 
+#Interactive menu that allows the user to choose how they want to run the pipeline
 def main():
     setup_logging("INFO")
     log.info("Pipeline runner started")
@@ -46,7 +47,7 @@ def main():
         except Exception:
             log.exception("Pipeline failed")
 
-
+#A function that runs the full pipeline with the complete data from the UK land registry
 def complete_data_pipeline():
     log.info("Running FULL pipeline")
     create_db_schema()
@@ -57,6 +58,7 @@ def complete_data_pipeline():
     create_views()
     log.info("Full pipeline finished")
 
+#A function that runs a monthly update pipeline with the complete data from the UK land registry
 def monthly_update_pipeline():
     log.info("Running MONTHLY pipeline")
     create_db_schema()
@@ -66,7 +68,7 @@ def monthly_update_pipeline():
     load_from_raw()
     create_views()
     log.info("MONTHLY pipeline finished")
-
+#A function that resets the database
 def reset():
     log.info("Running RESET")
     reset_database()

@@ -3,9 +3,11 @@ import logging
 
 log = logging.getLogger(__name__)
 
+#links to csv on the UK land registry website
 complete_data_url = "http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-complete.csv"
 monthly_update_url = "http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv"
 
+#Downloads the csv that contains all house sale transactions since 1995 to disk
 def download_complete_data_to_disk():
     log.info("Attempting to download complete-pp.csv to disk")
     file_path = "./data/pp-complete.csv"
@@ -18,6 +20,7 @@ def download_complete_data_to_disk():
                     file.write(chunk)
     log.info("complete-pp.csv download complete")
 
+#Downloads the csv responsible for monthly updates on the UK land registry
 def download_monthly_update():
     log.info("Attempting to download pp-monthly-update-new-version.csv to disk")
     file_path = "./data/pp-monthly-update-new-version.csv"
