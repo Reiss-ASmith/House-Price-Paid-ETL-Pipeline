@@ -40,6 +40,10 @@ CREATE TABLE IF NOT EXISTS raw_house_data.house_price_paid (
     record_status CHAR(1) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS raw_house_data.house_price_paid_monthly_update (
+    LIKE raw_house_data.house_price_paid INCLUDING ALL
+);
+
 -- TABLE CREATION FOR THE TABLES IN THE HOUSE_DATA SCHEMA
 --creates a counties table
 CREATE TABLE IF NOT EXISTS house_data.counties (
