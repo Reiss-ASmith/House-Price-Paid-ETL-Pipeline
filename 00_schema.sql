@@ -39,6 +39,10 @@ CREATE TABLE IF NOT EXISTS raw_house_data.house_price_paid (
     PPD_category CHAR(1) NOT NULL,
     record_status CHAR(1) NOT NULL
 );
+--creates a temporary table used to store the raw data from the monthly update csv 
+CREATE TABLE IF NOT EXISTS raw_house_data.house_price_paid_monthly_update (
+    LIKE raw_house_data.house_price_paid INCLUDING ALL
+);
 
 -- TABLE CREATION FOR THE TABLES IN THE HOUSE_DATA SCHEMA
 --creates a counties table
