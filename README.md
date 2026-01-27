@@ -2,23 +2,26 @@
 
 ## Project Summary
 
-This project is a PostgreSQL-based ELT data pipeline built using the UK House Price Paid dataset (1995 to present).
-It was created to practise and demonstrate core junior data engineering skills, including data modelling, SQL transformations,
-and working with containerised databases.
+This project is a PostgreSQL-based ELT data pipeline built using the UK Land Registry House Price Paid dataset (1995 to present), with support for both full historical loads and monthly incremental updates.
 
-The pipeline ingests raw property transaction data, structures it into a relational schema, and exposes analytical views
-that can be queried directly or used in BI tools such as Power BI.
+It was created to practise and demonstrate core junior data engineering skills, including Python-based orchestration, bulk data loading, SQL transformations, schema design, operational logging, and analytics consumption via Power BI.
+
+The pipeline ingests raw property transaction data, structures it into a relational schema, and exposes analytical views that are consumed by a Power BI dashboard.
 
 ---
 
 ## What This Project Demonstrates
 
-- Building a data pipeline using PostgreSQL and SQL
-- Loading raw data into a staging schema
+- Building an ELT data pipeline using Python and PostgreSQL
+- High-volume bulk loading using PostgreSQL COPY
+- Loading raw data into a dedicated staging schema
 - Designing a normalised data model with dimension and fact tables
 - Using year-based partitioning for scalable time-series data
 - Writing idempotent load logic using ON CONFLICT
+- Handling both full historical loads and monthly incremental updates
 - Creating reusable SQL views for analysis and reporting
+- Consuming PostgreSQL views in Power BI to build analytical dashboards
+- Structured logging to console and file for observability
 - Running PostgreSQL in a Docker container for reproducibility
 
 ---
@@ -28,13 +31,16 @@ that can be queried directly or used in BI tools such as Power BI.
 The pipeline follows an ELT (Extract, Load, Transform) pattern:
 
 1. Extract  
-   Raw CSV files are loaded into a staging schema called raw_house_data without modification.
+   Python scripts download the full historical dataset and monthly update files and write them to a local data directory.
 
 2. Load  
-   Data is inserted into cleaned and normalised tables in the house_data schema.
+   Raw CSV data is loaded into PostgreSQL using COPY. Separate raw landing tables are used for full and monthly loads before inserting into cleaned and normalised core tables.
 
 3. Transform  
    SQL views calculate analytical metrics such as median prices and transaction counts.
+
+4. Analyse  
+   Power BI connects directly to PostgreSQL and consumes the analytical views to produce dashboards.
 
 All transformations are performed inside PostgreSQL using SQL.
 
@@ -45,7 +51,7 @@ All transformations are performed inside PostgreSQL using SQL.
 ### Schemas
 
 raw_house_data  
-Contains raw, untransformed data exactly as it appears in the source CSV files.
+Contains raw, untransformed data exactly as it appears in the source CSV files. Separate landing tables are used for full and monthly loads.
 
 house_data  
 Contains the cleaned and structured warehouse tables, including:
@@ -53,36 +59,47 @@ Contains the cleaned and structured warehouse tables, including:
 - districts
 - property types
 - tenures
-- a partitioned fact table for house sales
+- a partitioned fact table for house price transactions
+
+---
 
 ### Fact Table
 
 house_data.house_price_paid
 - Partitioned by year on the date column
-- Composite primary key (sale_id, date) to support safe re-runs
+- Composite primary key (sale_id, date) to support partitioning and safe re-runs
 - Designed for time-based and regional analysis
 
 ---
-
-
 
 ## How to Run the Pipeline
 
 Requirements:
 - Docker Desktop
+- Python 3.x (virtual environment recommended)
 - VS Code with the PostgreSQL extension
-- House Price Paid CSV files placed in the data directory
+- Power BI Desktop (optional, for dashboard)
 
 Start PostgreSQL:
 docker compose up -d
 
-Run the SQL scripts in the following order using the VS Code PostgreSQL extension:
+Run the pipeline:
+python main.py
 
-99_reset.sql (optional, development only)
-00_schema.sql
-01_extract.sql
-02_load.sql
-03_transformation_views.sql
+You will be prompted to choose between:
+- a full historical load
+- a monthly update
+- a database reset (development only)
+
+---
+
+## Logging & Observability
+
+The pipeline uses structured logging:
+- logs are written to the console during execution
+- logs are also written to logs/pipeline.log
+
+Logs record pipeline stages, data load steps, SQL execution, and failures, making long-running operations easier to monitor and debug.
 
 ---
 
@@ -91,16 +108,19 @@ Run the SQL scripts in the following order using the VS Code PostgreSQL extensio
 The pipeline exposes SQL views that provide:
 - median house prices by year
 - median prices by district and county
-- sale counts over time
+- transaction counts over time
 
-These views are intended to be queried directly or used as a data source for BI tools.
+These views are consumed directly by **Power BI**, which is used to create an interactive dashboard for exploring UK house price trends.
 
 ---
 
 ## Design Notes
 
 - The pipeline is designed to be re-runnable without duplicating data
-- Partitioning is used to keep queries performant as the dataset grows
+- Full loads use TRUNCATE + COPY for predictable development runs
+- Monthly updates use a dedicated raw landing table
+- Core tables enforce uniqueness using ON CONFLICT
+- Partitioning keeps queries performant as the dataset grows
 - Raw data is preserved separately from transformed data to maintain traceability
 - Large CSV files are intentionally excluded from version control
 
@@ -108,10 +128,10 @@ These views are intended to be queried directly or used as a data source for BI 
 
 ## Future Improvements
 
-- Python scripts to automatically download and incrementally load new House Price Paid data from the UK government website
-- Basic data quality checks such as row counts, null checks, and duplicate detection
-- Automated execution of pipeline steps
-- Integration with a BI dashboard
+- Deploy the pipeline to a cloud-hosted PostgreSQL database (Azure)
+- Automate monthly updates using GitHub Actions
+- Add basic data quality checks such as row counts and null checks
+- Migrate analytics layer to Microsoft Fabric
 
 ---
 
